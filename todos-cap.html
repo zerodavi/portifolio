@@ -1,50 +1,160 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>The Beginning After The End</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
-            padding: 20px;
-        }
-        h1 {
-            text-align: center;
-            color: #00ffcc;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-            max-width: 300px;
-            margin: 20px auto;
-        }
-        li {
-            background-color: #1e1e1e;
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        a {
-            text-decoration: none;
-            color: #00ccff;
-            font-weight: bold;
-        }
-        a:hover {
-            color: #ffffff;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Robot Mission</title>
+
+<style>
+body {
+  margin: 0;
+  background: radial-gradient(#0b1d2a, #000);
+  font-family: Arial, sans-serif;
+  color: #00e5ff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.menu {
+  text-align: center;
+  max-width: 620px;
+}
+
+h1 {
+  font-size: 48px;
+  margin-bottom: 8px;
+  text-shadow: 0 0 15px #00e5ff;
+}
+
+p {
+  color: #ccc;
+  margin-bottom: 24px;
+}
+
+button {
+  padding: 15px 40px;
+  font-size: 20px;
+  border: none;
+  border-radius: 8px;
+  background: #00e5ff;
+  color: #000;
+  cursor: pointer;
+  box-shadow: 0 0 20px #00e5ff;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #00bcd4;
+}
+
+.loading {
+  margin-top: 16px;
+  display: none;
+  font-size: 14px;
+  color: #aaa;
+}
+
+.tip-box {
+  margin-top: 26px;
+  min-height: 40px;
+  font-size: 15px;
+  color: #ddd;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.tip-box.show {
+  opacity: 1;
+}
+
+.visitor-counter {
+  margin-top: 32px;
+  font-size: 13px;
+  color: #555;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.visitor-counter img {
+  margin-top: 6px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  height: 28px;
+}
+</style>
 </head>
+
 <body>
-    <h1>The Beginning After The End</h1>
-    <ul>
-        <li><a href="capitulo1.html">Capítulo 1</a></li>
-        <li><a href="cap2.html">Capítulo 2</a></li>
-        <li><a href="cap3.html">Capítulo 3</a></li>
-        <li><a href="cap4.html">Capítulo 4</a></li>
-        <li><a href="cap5.html">Capítulo 5</a></li>
-    </ul>
+
+<div class="menu">
+  <h1>ROBOT MISSION</h1>
+  <p>Um jogo de ação futurista</p>
+
+  <button onclick="startGame()">▶ INICIAR</button>
+
+  <div class="tip-box" id="tip"></div>
+
+  <div class="loading" id="loading">
+    Carregando jogo...
+  </div>
+
+  <div class="visitor-counter">
+    <!--
+      Troque a URL abaixo pelo endereço real do seu site no Neocities.
+      Exemplo: https://seusite.neocities.org
+    -->
+    <img
+      src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Frobotmission.neocities.org&count_bg=%2300E5FF&title_bg=%23111827&icon_color=%23FFFFFF&title=Visitas&edge_flat=true"
+      alt="Contador de visitas"
+    />
+  </div>
+</div>
+
+<script>
+// =============================================
+// DICAS
+// =============================================
+const tips = [
+  "🔫 O revólver possui apenas 4 balas. Recarregue com sabedoria.",
+  "📦 Munição extra vai para a reserva automaticamente.",
+  "🔑 Baús só podem ser abertos com chave.",
+  "🏪 A loja vende chave, vida e munição.",
+  "🛡️ Alguns inimigos podem defender tiros.",
+  "🎯 Complete missões para ganhar moedas.",
+  "💣 Robôs atiradores explodem se você chegar perto.",
+  "⌨️ Use E para interagir e Espaço para atacar."
+];
+
+tips.sort(() => Math.random() - 0.5);
+
+let tipIndex = 0;
+const tipEl = document.getElementById("tip");
+
+function showTip() {
+  tipEl.classList.remove("show");
+  setTimeout(() => {
+    tipEl.textContent = tips[tipIndex];
+    tipEl.classList.add("show");
+    tipIndex = (tipIndex + 1) % tips.length;
+  }, 300);
+}
+
+showTip();
+setInterval(showTip, 3500);
+
+// =============================================
+// INICIAR JOGO
+// =============================================
+function startGame() {
+  document.querySelector("button").style.display = "none";
+  document.getElementById("loading").style.display = "block";
+  setTimeout(() => {
+    window.location.href = "index.html";
+  }, 800);
+}
+</script>
+
 </body>
 </html>
