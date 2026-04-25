@@ -5,77 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gerador de Currículo Pro</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #0d1117;
-      color: #fff;
-      margin: 0;
-      padding: 20px;
-    }
+    body { font-family: 'Segoe UI', sans-serif; background: #0d1117; color: #fff; margin: 0; padding: 20px; }
     h1 { text-align: center; color: #58a6ff; }
     .container { max-width: 1000px; margin: auto; }
 
-    .form, .preview {
-      background: #161b22;
-      padding: 20px;
-      border-radius: 12px;
-      margin-top: 20px;
-    }
+    .form, .preview { background: #161b22; padding: 20px; border-radius: 12px; margin-top: 20px; }
 
-    input, textarea {
-      width: 100%;
-      padding: 10px;
-      margin: 6px 0 14px;
-      border-radius: 8px;
-      border: none;
-      background: #0d1117;
-      color: #fff;
-    }
+    input, textarea { width: 100%; padding: 10px; margin: 6px 0 10px; border-radius: 8px; border: none; background: #0d1117; color: #fff; }
 
-    button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      background: #238636;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      cursor: pointer;
-    }
+    button { width: 100%; padding: 12px; margin-top: 10px; background: #238636; color: white; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; }
     button:hover { background: #2ea043; }
 
-    .cv {
-      background: white;
-      color: black;
-      padding: 25px;
-      border-radius: 12px;
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 20px;
-    }
+    .add-btn { background: #1f6feb; }
 
-    .sidebar {
-      border-right: 2px solid #ddd;
-      padding-right: 15px;
-      text-align: center;
-    }
+    .cv { background: white; color: black; padding: 25px; border-radius: 12px; display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
 
-    .sidebar img {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 10px;
-    }
+    .sidebar { border-right: 2px solid #ddd; padding-right: 15px; text-align: center; }
+    .sidebar img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; }
 
-    .main h2 { margin: 0; }
     .section { margin-top: 15px; }
-    .section h3 {
-      border-bottom: 2px solid #58a6ff;
-      padding-bottom: 4px;
-      margin-bottom: 6px;
-    }
+    .section h3 { border-bottom: 2px solid #58a6ff; padding-bottom: 4px; margin-bottom: 6px; }
+
+    ul { padding-left: 18px; }
 
     @media (max-width: 700px) {
       .cv { grid-template-columns: 1fr; }
@@ -93,9 +44,17 @@
       <input type="text" id="email" placeholder="Email">
       <input type="text" id="telefone" placeholder="Telefone">
       <textarea id="resumo" placeholder="Resumo profissional"></textarea>
-      <textarea id="experiencia" placeholder="Experiência profissional"></textarea>
+
+      <h3>Experiências</h3>
+      <div id="experiencias"></div>
+      <button class="add-btn" onclick="addExperiencia()">+ Adicionar Experiência</button>
+
+      <h3>Habilidades</h3>
+      <div id="habilidades"></div>
+      <button class="add-btn" onclick="addHabilidade()">+ Adicionar Habilidade</button>
+
+      <h3>Formação</h3>
       <textarea id="formacao" placeholder="Formação acadêmica"></textarea>
-      <textarea id="habilidades" placeholder="Habilidades"></textarea>
 
       <button onclick="gerarCurriculo()">Gerar Currículo</button>
       <button onclick="baixarPDF()">Baixar PDF</button>
@@ -112,22 +71,35 @@
     document.getElementById('foto').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
-      reader.onload = function(event) {
-        fotoBase64 = event.target.result;
-      };
+      reader.onload = e => fotoBase64 = e.target.result;
       reader.readAsDataURL(file);
     });
+
+    function addExperiencia() {
+      const div = document.createElement('div');
+      div.innerHTML = '<textarea placeholder="Descreva a experiência"></textarea>';
+      document.getElementById('experiencias').appendChild(div);
+    }
+
+    function addHabilidade() {
+      const div = document.createElement('div');
+      div.innerHTML = '<input type="text" placeholder="Digite uma habilidade">';
+      document.getElementById('habilidades').appendChild(div);
+    }
 
     function gerarCurriculo() {
       const nome = document.getElementById('nome').value;
       const email = document.getElementById('email').value;
       const telefone = document.getElementById('telefone').value;
       const resumo = document.getElementById('resumo').value;
-      const experiencia = document.getElementById('experiencia').value;
       const formacao = document.getElementById('formacao').value;
-      const habilidades = document.getElementById('habilidades').value;
+
+      const experiencias = [...document.querySelectorAll('#experiencias textarea')]
+        .map(e => `<li>${e.value}</li>`).join('');
+
+      const habilidades = [...document.querySelectorAll('#habilidades input')]
+        .map(h => `<li>${h.value}</li>`).join('');
 
       document.getElementById('preview').innerHTML = `
         <div class="cv">
@@ -146,7 +118,7 @@
 
             <div class="section">
               <h3>Experiência</h3>
-              <p>${experiencia}</p>
+              <ul>${experiencias}</ul>
             </div>
 
             <div class="section">
@@ -156,7 +128,7 @@
 
             <div class="section">
               <h3>Habilidades</h3>
-              <p>${habilidades}</p>
+              <ul>${habilidades}</ul>
             </div>
           </div>
         </div>
@@ -167,14 +139,15 @@
       const conteudo = document.getElementById('preview').innerHTML;
       const janela = window.open('', '', 'width=800,height=600');
       janela.document.write(`
-        <html>
-        <head><title>Currículo</title></head>
-        <body>${conteudo}</body>
-        </html>
+        <html><head><title>Currículo</title></head><body>${conteudo}</body></html>
       `);
       janela.document.close();
       janela.print();
     }
+
+    // iniciar com 1 campo
+    addExperiencia();
+    addHabilidade();
   </script>
 </body>
 </html>
