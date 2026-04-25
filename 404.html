@@ -1,233 +1,116 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Robot Mission</title>
-
-<style>
-body {
-  margin: 0;
-  background: radial-gradient(#0b1d2a, #000);
-  font-family: Arial, sans-serif;
-  color: #00e5ff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-.menu {
-  text-align: center;
-  max-width: 620px;
-}
-
-h1 {
-  font-size: 48px;
-  margin-bottom: 8px;
-  text-shadow: 0 0 15px #00e5ff;
-}
-
-p {
-  color: #ccc;
-  margin-bottom: 24px;
-}
-
-button {
-  padding: 15px 40px;
-  font-size: 20px;
-  border: none;
-  border-radius: 8px;
-  background: #00e5ff;
-  color: #000;
-  cursor: pointer;
-  box-shadow: 0 0 20px #00e5ff;
-  transition: 0.2s;
-}
-
-button:hover {
-  background: #00bcd4;
-}
-
-.loading {
-  margin-top: 16px;
-  display: none;
-  font-size: 14px;
-  color: #aaa;
-}
-
-.tip-box {
-  margin-top: 26px;
-  min-height: 40px;
-  font-size: 15px;
-  color: #ddd;
-  opacity: 0;
-  transition: opacity 0.6s ease;
-}
-
-.tip-box.show {
-  opacity: 1;
-}
-
-/* Contador customizado */
-.visitor-counter {
-  margin-top: 32px;
-  font-size: 13px;
-  color: #555;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.visitor-badge {
-  display: inline-flex;
-  align-items: center;
-  margin-top: 8px;
-  border-radius: 4px;
-  overflow: hidden;
-  font-size: 12px;
-  font-family: Arial, sans-serif;
-  box-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
-}
-
-.badge-label {
-  background: #111827;
-  color: #fff;
-  padding: 5px 10px;
-  letter-spacing: 0.5px;
-}
-
-.badge-count {
-  background: #00E5FF;
-  color: #000;
-  padding: 5px 10px;
-  font-weight: bold;
-  min-width: 40px;
-  text-align: center;
-  letter-spacing: 0.5px;
-  transition: opacity 0.4s;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de Currículo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d1117;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #58a6ff;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0 15px;
+      border-radius: 8px;
+      border: none;
+      background: #161b22;
+      color: #fff;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #238636;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #2ea043;
+    }
+    .preview {
+      margin-top: 30px;
+      background: white;
+      color: black;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="container">
+    <h1>Gerador de Currículo</h1>
 
-<div class="menu">
-  <h1>ROBOT MISSION</h1>
-  <p>Um jogo de ação futurista</p>
+    <input type="text" id="nome" placeholder="Nome completo">
+    <input type="text" id="email" placeholder="Email">
+    <input type="text" id="telefone" placeholder="Telefone">
+    <textarea id="resumo" placeholder="Resumo profissional"></textarea>
+    <textarea id="experiencia" placeholder="Experiência profissional"></textarea>
+    <textarea id="formacao" placeholder="Formação acadêmica"></textarea>
+    <textarea id="habilidades" placeholder="Habilidades"></textarea>
 
-  <button onclick="startGame()">▶ INICIAR</button>
+    <button onclick="gerarCurriculo()">Gerar Currículo</button>
+    <button onclick="baixarPDF()">Baixar PDF</button>
 
-  <div class="tip-box" id="tip"></div>
-
-  <div class="loading" id="loading">
-    Carregando jogo...
+    <div id="preview" class="preview"></div>
   </div>
 
-  <div class="visitor-counter">
-    <div class="visitor-badge">
-      <span class="badge-label">VISITAS</span>
-      <span class="badge-count" id="visit-count">…</span>
-    </div>
-  </div>
-</div>
+  <script>
+    function gerarCurriculo() {
+      const nome = document.getElementById('nome').value;
+      const email = document.getElementById('email').value;
+      const telefone = document.getElementById('telefone').value;
+      const resumo = document.getElementById('resumo').value;
+      const experiencia = document.getElementById('experiencia').value;
+      const formacao = document.getElementById('formacao').value;
+      const habilidades = document.getElementById('habilidades').value;
 
-<script>
-// =============================================
-// DICAS
-// =============================================
-const tips = [
-  "🔫 O revólver possui apenas 4 balas. Recarregue com sabedoria.",
-  "📦 Munição extra vai para a reserva automaticamente.",
-  "🔑 Baús só podem ser abertos com chave.",
-  "🏪 A loja vende chave, vida e munição.",
-  "🛡️ Alguns inimigos podem defender tiros.",
-  "🎯 Complete missões para ganhar moedas.",
-  "💣 Robôs atiradores explodem se você chegar perto.",
-  "⌨️ Use E para interagir e Espaço para atacar."
-];
-
-tips.sort(() => Math.random() - 0.5);
-
-let tipIndex = 0;
-const tipEl = document.getElementById("tip");
-
-function showTip() {
-  tipEl.classList.remove("show");
-  setTimeout(() => {
-    tipEl.textContent = tips[tipIndex];
-    tipEl.classList.add("show");
-    tipIndex = (tipIndex + 1) % tips.length;
-  }, 300);
-}
-
-showTip();
-setInterval(showTip, 3500);
-
-// =============================================
-// CONTADOR DE VISITAS — SUPABASE + LOCALSTORAGE
-// =============================================
-const SUPABASE_URL = "https://dyvwcrmtminwcwyteynm.supabase.co";
-const SUPABASE_KEY = "sb_publishable_aLscpSRu7Y0T2e4QjviYYA_ZAFhqZAH";
-const STORAGE_KEY  = "robot_mission_visited";
-
-const countEl = document.getElementById("visit-count");
-
-async function fetchCount() {
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/contador?id=eq.1&select=visitas`,
-    { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
-  );
-  const data = await res.json();
-  return data[0]?.visitas ?? 0;
-}
-
-async function incrementCount(current) {
-  await fetch(
-    `${SUPABASE_URL}/rest/v1/contador?id=eq.1`,
-    {
-      method: "PATCH",
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-        "Content-Type": "application/json",
-        Prefer: "return=minimal"
-      },
-      body: JSON.stringify({ visitas: current + 1 })
-    }
-  );
-  return current + 1;
-}
-
-async function initCounter() {
-  try {
-    const alreadyVisited = localStorage.getItem(STORAGE_KEY);
-    let count = await fetchCount();
-
-    if (!alreadyVisited) {
-      // Primeira vez neste navegador — incrementa
-      count = await incrementCount(count);
-      localStorage.setItem(STORAGE_KEY, "1");
+      document.getElementById('preview').innerHTML = `
+        <h2>${nome}</h2>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Telefone:</strong> ${telefone}</p>
+        <h3>Resumo</h3>
+        <p>${resumo}</p>
+        <h3>Experiência</h3>
+        <p>${experiencia}</p>
+        <h3>Formação</h3>
+        <p>${formacao}</p>
+        <h3>Habilidades</h3>
+        <p>${habilidades}</p>
+      `;
     }
 
-    countEl.textContent = count;
-  } catch (err) {
-    console.error("Erro no contador:", err);
-    countEl.textContent = "—";
-  }
-}
-
-initCounter();
-
-// =============================================
-// INICIAR JOGO
-// =============================================
-function startGame() {
-  document.querySelector("button").style.display = "none";
-  document.getElementById("loading").style.display = "block";
-  setTimeout(() => {
-    window.location.href = "index.html";
-  }, 800);
-}
-</script>
-
+    function baixarPDF() {
+      const conteudo = document.getElementById('preview').innerHTML;
+      const janela = window.open('', '', 'width=800,height=600');
+      janela.document.write(`
+        <html>
+        <head><title>Currículo</title></head>
+        <body>${conteudo}</body>
+        </html>
+      `);
+      janela.document.close();
+      janela.print();
+    }
+  </script>
 </body>
 </html>
