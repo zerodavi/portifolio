@@ -3,151 +3,138 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gerador de Currículo Pro</title>
+  <title>Chat com Davi</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    body { font-family: 'Segoe UI', sans-serif; background: #0d1117; color: #fff; margin: 0; padding: 20px; }
-    h1 { text-align: center; color: #58a6ff; }
-    .container { max-width: 1000px; margin: auto; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0d1117;
+      color: #c9d1d9;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
 
-    .form, .preview { background: #161b22; padding: 20px; border-radius: 12px; margin-top: 20px; }
+    header {
+      padding: 15px;
+      text-align: center;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      font-size: 18px;
+    }
 
-    input, textarea { width: 100%; padding: 10px; margin: 6px 0 10px; border-radius: 8px; border: none; background: #0d1117; color: #fff; }
+    #chat {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+    }
 
-    button { width: 100%; padding: 12px; margin-top: 10px; background: #238636; color: white; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; }
-    button:hover { background: #2ea043; }
+    .msg {
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      max-width: 70%;
+    }
 
-    .add-btn { background: #1f6feb; }
+    .user {
+      background: #238636;
+      align-self: flex-end;
+    }
 
-    .cv { background: white; color: black; padding: 25px; border-radius: 12px; display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+    .davi {
+      background: #1f6feb;
+      align-self: flex-start;
+    }
 
-    .sidebar { border-right: 2px solid #ddd; padding-right: 15px; text-align: center; }
-    .sidebar img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; }
+    #form {
+      display: flex;
+      border-top: 1px solid #30363d;
+    }
 
-    .section { margin-top: 15px; }
-    .section h3 { border-bottom: 2px solid #58a6ff; padding-bottom: 4px; margin-bottom: 6px; }
+    #input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+      background: #0d1117;
+      color: white;
+    }
 
-    ul { padding-left: 18px; }
-
-    @media (max-width: 700px) {
-      .cv { grid-template-columns: 1fr; }
-      .sidebar { border-right: none; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: #1f6feb;
+      color: white;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Gerador de Currículo Pro</h1>
 
-    <div class="form">
-      <input type="file" id="foto" accept="image/*">
-      <input type="text" id="nome" placeholder="Nome completo">
-      <input type="text" id="email" placeholder="Email">
-      <input type="text" id="telefone" placeholder="Telefone">
-      <textarea id="resumo" placeholder="Resumo profissional"></textarea>
+<header>💬 Chat direto com Davi</header>
 
-      <h3>Experiências</h3>
-      <div id="experiencias"></div>
-      <button class="add-btn" onclick="addExperiencia()">+ Adicionar Experiência</button>
+<div id="chat"></div>
 
-      <h3>Habilidades</h3>
-      <div id="habilidades"></div>
-      <button class="add-btn" onclick="addHabilidade()">+ Adicionar Habilidade</button>
+<form id="form">
+  <input id="input" placeholder="Digite sua mensagem..." required />
+  <button type="submit">Enviar</button>
+</form>
 
-      <h3>Formação</h3>
-      <textarea id="formacao" placeholder="Formação acadêmica"></textarea>
+<script>
+  const supabaseUrl = 'https://gqwcgaahjqklgmrswytb.supabase.co';
+  const supabaseKey = 'sb_publishable_bkCd5J8y1e4GszEv4S45yQ_YLZ48Wis';
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-      <button onclick="gerarCurriculo()">Gerar Currículo</button>
-      <button onclick="baixarPDF()">Baixar PDF</button>
-    </div>
+  const chat = document.getElementById('chat');
+  const form = document.getElementById('form');
+  const input = document.getElementById('input');
 
-    <div class="preview">
-      <div id="preview"></div>
-    </div>
-  </div>
+  function addMessage(text, type) {
+    const div = document.createElement('div');
+    div.classList.add('msg', type);
+    div.innerText = text;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+  }
 
-  <script>
-    let fotoBase64 = '';
+  async function loadMessages() {
+    const { data, error } = await supabase
+      .from('messages')
+      .select('*')
+      .order('id', { ascending: true });
 
-    document.getElementById('foto').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => fotoBase64 = e.target.result;
-      reader.readAsDataURL(file);
+    if (error) return console.error(error);
+
+    chat.innerHTML = '';
+    data.forEach(msg => {
+      addMessage(msg.text, msg.sender === 'user' ? 'user' : 'davi');
     });
+  }
 
-    function addExperiencia() {
-      const div = document.createElement('div');
-      div.innerHTML = '<textarea placeholder="Descreva a experiência"></textarea>';
-      document.getElementById('experiencias').appendChild(div);
-    }
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-    function addHabilidade() {
-      const div = document.createElement('div');
-      div.innerHTML = '<input type="text" placeholder="Digite uma habilidade">';
-      document.getElementById('habilidades').appendChild(div);
-    }
+    const text = input.value;
 
-    function gerarCurriculo() {
-      const nome = document.getElementById('nome').value;
-      const email = document.getElementById('email').value;
-      const telefone = document.getElementById('telefone').value;
-      const resumo = document.getElementById('resumo').value;
-      const formacao = document.getElementById('formacao').value;
+    await supabase
+      .from('messages')
+      .insert([{ text, sender: 'user' }]);
 
-      const experiencias = [...document.querySelectorAll('#experiencias textarea')]
-        .map(e => `<li>${e.value}</li>`).join('');
+    input.value = '';
+  });
 
-      const habilidades = [...document.querySelectorAll('#habilidades input')]
-        .map(h => `<li>${h.value}</li>`).join('');
+  // Tempo real
+  supabase
+    .channel('chat')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+      const msg = payload.new;
+      addMessage(msg.text, msg.sender === 'user' ? 'user' : 'davi');
+    })
+    .subscribe();
 
-      document.getElementById('preview').innerHTML = `
-        <div class="cv">
-          <div class="sidebar">
-            ${fotoBase64 ? `<img src="${fotoBase64}">` : ''}
-            <p><strong>${nome}</strong></p>
-            <p>${email}</p>
-            <p>${telefone}</p>
-          </div>
+  loadMessages();
+</script>
 
-          <div class="main">
-            <div class="section">
-              <h3>Resumo</h3>
-              <p>${resumo}</p>
-            </div>
-
-            <div class="section">
-              <h3>Experiência</h3>
-              <ul>${experiencias}</ul>
-            </div>
-
-            <div class="section">
-              <h3>Formação</h3>
-              <p>${formacao}</p>
-            </div>
-
-            <div class="section">
-              <h3>Habilidades</h3>
-              <ul>${habilidades}</ul>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function baixarPDF() {
-      const conteudo = document.getElementById('preview').innerHTML;
-      const janela = window.open('', '', 'width=800,height=600');
-      janela.document.write(`
-        <html><head><title>Currículo</title></head><body>${conteudo}</body></html>
-      `);
-      janela.document.close();
-      janela.print();
-    }
-
-    // iniciar com 1 campo
-    addExperiencia();
-    addHabilidade();
-  </script>
 </body>
 </html>
