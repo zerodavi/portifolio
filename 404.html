@@ -3,35 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gerador de Currículo</title>
+  <title>Gerador de Currículo Pro</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background: #0d1117;
       color: #fff;
       margin: 0;
       padding: 20px;
     }
-    h1 {
-      text-align: center;
-      color: #58a6ff;
+    h1 { text-align: center; color: #58a6ff; }
+    .container { max-width: 1000px; margin: auto; }
+
+    .form, .preview {
+      background: #161b22;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 20px;
     }
-    .container {
-      max-width: 900px;
-      margin: auto;
-    }
+
     input, textarea {
       width: 100%;
       padding: 10px;
-      margin: 5px 0 15px;
+      margin: 6px 0 14px;
       border-radius: 8px;
       border: none;
-      background: #161b22;
+      background: #0d1117;
       color: #fff;
     }
+
     button {
       width: 100%;
       padding: 12px;
+      margin-top: 10px;
       background: #238636;
       color: white;
       border: none;
@@ -39,42 +43,83 @@
       font-size: 16px;
       cursor: pointer;
     }
-    button:hover {
-      background: #2ea043;
-    }
-    .preview {
-      margin-top: 30px;
+    button:hover { background: #2ea043; }
+
+    .cv {
       background: white;
       color: black;
-      padding: 20px;
-      border-radius: 10px;
+      padding: 25px;
+      border-radius: 12px;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 20px;
     }
-    @media (max-width: 600px) {
-      body {
-        padding: 10px;
-      }
+
+    .sidebar {
+      border-right: 2px solid #ddd;
+      padding-right: 15px;
+      text-align: center;
+    }
+
+    .sidebar img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+
+    .main h2 { margin: 0; }
+    .section { margin-top: 15px; }
+    .section h3 {
+      border-bottom: 2px solid #58a6ff;
+      padding-bottom: 4px;
+      margin-bottom: 6px;
+    }
+
+    @media (max-width: 700px) {
+      .cv { grid-template-columns: 1fr; }
+      .sidebar { border-right: none; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Gerador de Currículo</h1>
+    <h1>Gerador de Currículo Pro</h1>
 
-    <input type="text" id="nome" placeholder="Nome completo">
-    <input type="text" id="email" placeholder="Email">
-    <input type="text" id="telefone" placeholder="Telefone">
-    <textarea id="resumo" placeholder="Resumo profissional"></textarea>
-    <textarea id="experiencia" placeholder="Experiência profissional"></textarea>
-    <textarea id="formacao" placeholder="Formação acadêmica"></textarea>
-    <textarea id="habilidades" placeholder="Habilidades"></textarea>
+    <div class="form">
+      <input type="file" id="foto" accept="image/*">
+      <input type="text" id="nome" placeholder="Nome completo">
+      <input type="text" id="email" placeholder="Email">
+      <input type="text" id="telefone" placeholder="Telefone">
+      <textarea id="resumo" placeholder="Resumo profissional"></textarea>
+      <textarea id="experiencia" placeholder="Experiência profissional"></textarea>
+      <textarea id="formacao" placeholder="Formação acadêmica"></textarea>
+      <textarea id="habilidades" placeholder="Habilidades"></textarea>
 
-    <button onclick="gerarCurriculo()">Gerar Currículo</button>
-    <button onclick="baixarPDF()">Baixar PDF</button>
+      <button onclick="gerarCurriculo()">Gerar Currículo</button>
+      <button onclick="baixarPDF()">Baixar PDF</button>
+    </div>
 
-    <div id="preview" class="preview"></div>
+    <div class="preview">
+      <div id="preview"></div>
+    </div>
   </div>
 
   <script>
+    let fotoBase64 = '';
+
+    document.getElementById('foto').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        fotoBase64 = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
     function gerarCurriculo() {
       const nome = document.getElementById('nome').value;
       const email = document.getElementById('email').value;
@@ -85,17 +130,36 @@
       const habilidades = document.getElementById('habilidades').value;
 
       document.getElementById('preview').innerHTML = `
-        <h2>${nome}</h2>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Telefone:</strong> ${telefone}</p>
-        <h3>Resumo</h3>
-        <p>${resumo}</p>
-        <h3>Experiência</h3>
-        <p>${experiencia}</p>
-        <h3>Formação</h3>
-        <p>${formacao}</p>
-        <h3>Habilidades</h3>
-        <p>${habilidades}</p>
+        <div class="cv">
+          <div class="sidebar">
+            ${fotoBase64 ? `<img src="${fotoBase64}">` : ''}
+            <p><strong>${nome}</strong></p>
+            <p>${email}</p>
+            <p>${telefone}</p>
+          </div>
+
+          <div class="main">
+            <div class="section">
+              <h3>Resumo</h3>
+              <p>${resumo}</p>
+            </div>
+
+            <div class="section">
+              <h3>Experiência</h3>
+              <p>${experiencia}</p>
+            </div>
+
+            <div class="section">
+              <h3>Formação</h3>
+              <p>${formacao}</p>
+            </div>
+
+            <div class="section">
+              <h3>Habilidades</h3>
+              <p>${habilidades}</p>
+            </div>
+          </div>
+        </div>
       `;
     }
 
